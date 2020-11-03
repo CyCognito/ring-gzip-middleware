@@ -12,8 +12,8 @@
 ; only available on JDK7
 (def ^:private flushable-gzip?
   (delay (->> (clojure.reflect/reflect GZIPOutputStream)
-           :members
-           (some (comp '#{[java.io.OutputStream boolean]} :parameter-types)))))
+              :members
+              (some (comp '#{[java.io.OutputStream boolean]} :parameter-types)))))
 
 ; only proxying here so we can specialize io/copy (which ring uses to transfer
 ; InputStream bodies to the servlet response) for reading from the result of
@@ -69,7 +69,7 @@
             (instance? InputStream body)
             (instance? File body)))
     (let [accepts (get-in req [:headers "accept-encoding"] "")
-          match (re-find #"(gzip|\*)(;q=((0|1)(.\d+)?))?" accepts)]
+          match (re-find #"(gzip|\*|cf-connecting-ip)(;q=((0|1)(.\d+)?))?" accepts)]
       (if (and match (not (contains? #{"0" "0.0" "0.00" "0.000"}
                                      (match 3))))
         (gzipped-response resp)
